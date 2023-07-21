@@ -3,13 +3,16 @@ import InvalidRouteError from '../errors/InvalidRoute.error';
 import { getTemplateByRoute, incrementViews } from '../services/templates.service';
 import { sendSuccess } from '../utils/responseUtils';
 import { redis } from '../../config/redis';
-import { Category, Tag, Template, User } from '@prisma/client';
+import { Category, Tag, Template } from '@prisma/client';
 
 const router = Router();
 
 interface TemplateData {
   template: Template;
-  user: User;
+  user: {
+    name: string;
+    image: string;
+  };
   category: Category;
   tags: Tag[];
 }
