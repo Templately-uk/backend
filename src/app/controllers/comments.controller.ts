@@ -18,10 +18,7 @@ router.get('/comments/:route', async (req: Request, res: Response, next: NextFun
     const { route } = req.params;
     if (!route) throw new InvalidRouteError(['route']);
 
-    // Find userID if logged in else null
-    const userId = req.userID;
-
-    const comments = await getCommentsByTemplateRoute(route, String(userId));
+    const comments = await getCommentsByTemplateRoute(route);
     sendSuccess(
       res,
       {

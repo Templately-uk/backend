@@ -1,8 +1,9 @@
-import { Category, Tag, Template, User } from '@prisma/client';
+import { Category, Tag, Template } from '@prisma/client';
 import { prisma } from '../../config/prisma';
 import { getCategoryByName } from './categories.service';
 import { findOrCreateTags } from './tags.service';
 import CannotFindTemplateError from '../errors/cannotFindTemplate.error';
+import { getUserById } from './clerk.service';
 
 /**
  * Count all templates.
@@ -19,7 +20,10 @@ export const getTemplateByRoute = async (
   route: string,
 ): Promise<{
   template: Template;
-  user: User;
+  user: {
+    image: string;
+    name: string;
+  };
   category: Category;
   tags: Tag[];
 }> => {
@@ -28,16 +32,17 @@ export const getTemplateByRoute = async (
       route,
     },
     include: {
-      user: true,
       category: true,
       tags: true,
     },
   });
   if (!record) throw new CannotFindTemplateError(route);
 
+  const user = await getUserById(record.userId);
+
   return {
     template: record,
-    user: record.user,
+    user,
     category: record.category,
     tags: record.tags,
   };

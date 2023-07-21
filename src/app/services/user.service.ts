@@ -1,4 +1,5 @@
 import { prisma } from '../../config/prisma';
+import { getUserById } from './clerk.service';
 
 /**
  * Get all user-owned templates.
@@ -13,12 +14,7 @@ export const getTemplatesByUser = async (userID: string): Promise<GetTemplatesBy
       route: true,
       title: true,
       summary: true,
-      user: {
-        select: {
-          name: true,
-          image: true,
-        },
-      },
+      userId: true,
       category: {
         select: {
           id: true,
@@ -37,7 +33,19 @@ export const getTemplatesByUser = async (userID: string): Promise<GetTemplatesBy
     },
   });
 
-  return templates;
+  const user = await getUserById(userID);
+
+  // TODO: make more efficient
+  const hits = await Promise.all(
+    templates.map(async (template) => {
+      return {
+        ...template,
+        user,
+      };
+    }),
+  );
+
+  return hits;
 };
 interface GetTemplatesByUserResponse {
   id: number;

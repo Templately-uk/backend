@@ -9,7 +9,6 @@ import { handleError } from './app/middlewares/errorHandler.middleware';
 import morganMiddleware from './app/middlewares/morgan.middleware';
 import * as Sentry from '@sentry/node';
 import { environment as config } from './config/environment';
-import errorhandler from 'errorhandler';
 import expressStatusMonitor from 'express-status-monitor';
 
 // Routes
@@ -37,18 +36,16 @@ if (config.production) {
   app.use(Sentry.Handlers.requestHandler());
   app.use(Sentry.Handlers.tracingHandler());
   app.use(Sentry.Handlers.errorHandler());
-} else {
-  app.use(errorhandler());
 }
 
 /* Monitoring */
 app.use(expressStatusMonitor({ path: '/admin/status' }));
 
 /* Global middleware */
-app.use(compression());
 app.use(cors());
 app.use(express.json());
 app.use(morganMiddleware);
+app.use(compression());
 
 /* Routes */
 app.use(StatusRoutes);

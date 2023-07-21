@@ -1,17 +1,17 @@
 import { prisma } from '../../config/prisma';
+import { getUserById } from './clerk.service';
 
 /**
  * Return the comments for a template.
  */
 export const getCommentsByTemplateRoute = async (
   route: string,
-  userId: string | undefined,
 ): Promise<
   {
     id: number;
     content: string;
     createdAt: Date;
-    user: {
+    user?: {
       name: string | null;
       image: string | null;
     };
@@ -35,23 +35,27 @@ export const getCommentsByTemplateRoute = async (
       id: true,
       content: true,
       createdAt: true,
-      user: {
-        select: {
-          name: true,
-          image: true,
-          id: true,
-        },
-      },
+      userId: true, // Assuming the 'comment' model has 'userId'
     },
   });
 
-  // Map over comments and add where logged in user is the owner
-  const commentsWithOwner = comments.map((record) => ({
-    ...record,
-    owner: record.user.id === userId,
-  }));
+  // Fetch user details for each comment and construct the final comments array.
+  const finalComments = await Promise.all(
+    comments.map(async (comment) => {
+      let user;
 
-  return commentsWithOwner;
+      if (comment.userId) {
+        user = await getUserById(comment.userId);
+      }
+
+      return {
+        ...comment,
+        user,
+      };
+    }),
+  );
+
+  return finalComments;
 };
 
 /**

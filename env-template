@@ -1,0 +1,45 @@
+# PRIVATE ENVIRONMENT VARIABLES
+
+# ------------------------------------------------------------------------------
+
+# DATABASE_URL: The URL for the PostgreSQL database in this format:
+
+# postgresql://<username>:<password>@<hostname>:<port>/<database_name>
+
+DATABASE_URL=""
+
+# API_SECRET: The secret key for validating the Next-Auth frontend API route.
+
+API_SECRET=""
+
+# SENTRY_DSN: The Data Source Name (DSN) for enabling Sentry SDK for error tracking and reporting.
+
+SENTRY_DSN=""
+
+# OPENAI_KEY: The API key for OpenAI's GPT-3 service.
+
+OPENAI_KEY=""
+
+# NODE_ENV: The switch to select the mode of the environment.
+
+NODE_ENV=debug
+
+# PRODUCTION: Switch that sets the environment to production mode.
+
+PRODUCTION=false
+
+# REDIS_URL: The URL for the Redis database (used for queues).
+
+REDIS_URL=""
+
+# PORT: The port for express server
+
+PORT=8000
+
+# CLIENTSIDE VARIABLES
+
+# ------------------------------------------------------------------------------
+
+# BACKEND_URL: The base URL of the backend service.
+
+BACKEND_URL=""

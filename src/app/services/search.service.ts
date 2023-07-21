@@ -1,5 +1,6 @@
 import { Prisma as PrismaType } from '@prisma/client';
 import { prisma } from '../../config/prisma';
+import { getUserById } from './clerk.service';
 
 /**
  * Search for templates given a search terms input.
@@ -48,12 +49,6 @@ export const searchTemplates = async (
       route: true,
       title: true,
       summary: true,
-      user: {
-        select: {
-          name: true,
-          image: true,
-        },
-      },
       category: {
         select: {
           id: true,
@@ -65,6 +60,7 @@ export const searchTemplates = async (
           name: true,
         },
       },
+      userId: true,
       aiTones: true,
       views: true,
       votes: true,
@@ -78,9 +74,21 @@ export const searchTemplates = async (
       [sort]: order,
     },
   });
-
+  // TODO: make more efficient
+  const hits = await Promise.all(
+    searchResults.map(async (template) => {
+      const user = await getUserById(template.userId);
+      return {
+        ...template,
+        user: {
+          name: user.name,
+          image: user.image,
+        },
+      };
+    }),
+  );
   return {
-    hits: searchResults,
+    hits,
     totalHits,
     totalPages,
     currentPage,
