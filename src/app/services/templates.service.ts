@@ -42,7 +42,7 @@ export const getTemplateByRoute = async (
 
   return {
     template: record,
-    user,
+    user: user,
     category: record.category,
     tags: record.tags,
   };
@@ -137,12 +137,7 @@ export const getTemplatesByIds = async (ids: number[]): Promise<getTemplatesById
       route: true,
       title: true,
       summary: true,
-      user: {
-        select: {
-          name: true,
-          image: true,
-        },
-      },
+      userId: true,
       category: {
         select: {
           id: true,
@@ -161,7 +156,20 @@ export const getTemplatesByIds = async (ids: number[]): Promise<getTemplatesById
     },
   });
 
-  return templates;
+  const hits = await Promise.all(
+    templates.map(async (template) => {
+      const user = await getUserById(template.userId);
+      return {
+        ...template,
+        user: {
+          name: user.name,
+          image: user.image,
+        },
+      };
+    }),
+  );
+
+  return hits;
 };
 interface getTemplatesByIdsResponse {
   id: number;

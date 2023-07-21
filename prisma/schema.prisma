@@ -18,10 +18,12 @@ model Template {
   // Identifiers & references
   id         Int     @id @default(autoincrement())
   route      String  @unique
-  userId     String
   accountId  String?
   categoryId Int
   tags       Tag[]
+
+  // User Identity
+  userId String
 
   // Actual template
   title   String

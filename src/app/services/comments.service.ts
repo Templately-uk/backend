@@ -46,6 +46,11 @@ export const getCommentsByTemplateRoute = async (
 
       if (comment.userId) {
         user = await getUserById(comment.userId);
+      } else {
+        user = {
+          name: null,
+          image: null,
+        };
       }
 
       return {
