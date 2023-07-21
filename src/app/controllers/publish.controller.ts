@@ -52,7 +52,7 @@ router.post(
       if (!result) throw new UnexpectedDatabaseError();
 
       // Push the template to the Analysis Queue (Redis)
-      await templateAnalysisQueue.add({
+      templateAnalysisQueue.add({
         templateId: result.id,
       });
 

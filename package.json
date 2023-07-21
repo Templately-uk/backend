@@ -10,12 +10,8 @@
     "test": "cross-env NODE_ENV=test jest --testTimeout=100000",
     "prettier": "prettier --config .prettierrc --write src/**/*.ts",
     "lint": "eslint src/**/*.ts",
-    "format": "eslint src/**/*.ts --fix"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged && npm run lint"
-    }
+    "format": "eslint src/**/*.ts --fix",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "James.buzz <hello@james.buzz>",
