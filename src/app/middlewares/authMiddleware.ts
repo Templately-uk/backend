@@ -21,7 +21,6 @@ import crypto from 'crypto';
 const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const apiSecret = req.headers['x-api-secret'];
   const userID = req.headers['x-user-id'];
-  console.log('🚀 ~ file: authMiddleware.ts:24 ~ authMiddleware ~ userID:', userID);
 
   // Check userID is present in headers
   if (!userID) next(new NoAuthorisationError());
@@ -30,8 +29,6 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
   const envAPISecret = crypto.createHash('sha256').update(config.api.secret).digest('hex');
 
   if (!apiSecret || apiSecret !== envAPISecret) {
-    console.log('Invalid API Secret');
-    console.log(apiSecret + ':' + envAPISecret);
     next(new Error('Invalid API Secret'));
     return;
   }
