@@ -1,6 +1,5 @@
-import { Category, Tag, Template } from '@prisma/client';
+import { Tag, Template } from '@prisma/client';
 import { prisma } from '../../config/prisma';
-import { getCategoryByName } from './categories.service';
 import { findOrCreateTags } from './tags.service';
 import CannotFindTemplateError from '../errors/cannotFindTemplate.error';
 import { getUserById } from './clerk.service';
@@ -17,26 +16,31 @@ export const countTemplates = async (): Promise<number> => {
  * Get template by specific slug.
  */
 export const getTemplateByRoute = async (
-  route: string,
+  templateRoute: string,
 ): Promise<{
   template: Template;
   user: {
     image: string;
     name: string;
   };
-  category: Category;
-  tags: Tag[];
+  category: string;
+  tags: {
+    name: string;
+  }[];
 }> => {
   const record = await prisma.template.findUnique({
     where: {
-      route,
+      route: templateRoute,
     },
     include: {
-      category: true,
-      tags: true,
+      tags: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
-  if (!record) throw new CannotFindTemplateError(route);
+  if (!record) throw new CannotFindTemplateError(templateRoute);
 
   const user = await getUserById(record.userId);
 
@@ -63,9 +67,6 @@ export const insertNewTemplate = async ({
   const route = title.replace(/\s/g, '_').toLowerCase();
   const uniqueRoute = await findUniqueRoute(route);
 
-  // Find category
-  const categoryModel = await getCategoryByName(category);
-
   // Find tags to use or create new ones
   const tagsToAssign = await findOrCreateTags(userID, tags);
 
@@ -73,10 +74,10 @@ export const insertNewTemplate = async ({
     data: {
       route: uniqueRoute,
       userId: userID,
-      categoryId: categoryModel.id,
+      category,
       title: title,
-      summary: useCase,
-      body: template,
+      useCase,
+      template,
       aiTones: '',
       tags: {
         connect: tagsToAssign.map((tag) => ({ id: tag.id })), // Connect existing tags
@@ -136,14 +137,9 @@ export const getTemplatesByIds = async (ids: number[]): Promise<getTemplatesById
       id: true,
       route: true,
       title: true,
-      summary: true,
+      useCase: true,
       userId: true,
-      category: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
+      category: true,
       tags: {
         select: {
           name: true,
@@ -175,6 +171,7 @@ interface getTemplatesByIdsResponse {
   id: number;
   route: string;
   title: string;
+  category: string;
   user: {
     name: string | null;
     image: string | null;

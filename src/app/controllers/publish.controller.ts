@@ -9,6 +9,7 @@ import logger from '../../config/logger';
 import UnexpectedDatabaseError from '../errors/unexpectedDatabase.error';
 import { templateAnalysisQueue } from '../../config/redis';
 import Filter from 'bad-words';
+import { Categories } from '../types/category';
 
 const router = Router();
 
@@ -46,13 +47,15 @@ router.post(
       if (!req.userID) throw new NoAuthorisationError();
       const userID = req.userID;
 
-      logger.info(`Inserting a new template for user ${userID}: ${body.title}`);
+      logger.info(`Publishing a new template for user ${userID}: ${body.title}`);
 
+      // Attempt to insert the new template into the database
       const result = await insertNewTemplate({ userID, ...body });
       if (!result) throw new UnexpectedDatabaseError();
 
-      // Push the template to the Analysis Queue (Redis)
       templateAnalysisQueue.add({
+        // Perform an analysis on the template with ChatGPT
+        // for sentient analysis
         templateId: result.id,
       });
 
@@ -71,7 +74,10 @@ router.post(
 
 const NewTemplateScheme = yup.object().shape({
   title: yup.string().min(6).max(64).required(),
-  category: yup.string().min(1).max(50).required(),
+  category: yup
+    .string()
+    .oneOf(Object.keys(Categories) as string[], 'Invalid category')
+    .required(),
   tags: yup.array().of(yup.string()),
   usecase: yup.string().min(32).max(164).required(),
   template: yup.string().min(32).required(),

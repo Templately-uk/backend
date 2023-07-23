@@ -5,11 +5,11 @@ import { getUserById } from './clerk.service';
  * Return the comments for a template.
  */
 export const getCommentsByTemplateRoute = async (
-  route: string,
+  templateRoute: string,
 ): Promise<
   {
     id: number;
-    content: string;
+    comment: string;
     createdAt: Date;
     user?: {
       name: string | null;
@@ -23,7 +23,7 @@ export const getCommentsByTemplateRoute = async (
       id: true,
     },
     where: {
-      route,
+      route: templateRoute,
     },
   });
 
@@ -33,7 +33,7 @@ export const getCommentsByTemplateRoute = async (
     },
     select: {
       id: true,
-      content: true,
+      comment: true,
       createdAt: true,
       userId: true, // Assuming the 'comment' model has 'userId'
     },
@@ -66,7 +66,7 @@ export const getCommentsByTemplateRoute = async (
 /**
  * Insert a new comment to template.
  */
-export const addNewComment = async (userId: string, route: string, content: string) => {
+export const addNewComment = async (userId: string, route: string, comment: string) => {
   const template = await prisma.template.findUniqueOrThrow({
     select: {
       route: true,
@@ -81,7 +81,7 @@ export const addNewComment = async (userId: string, route: string, content: stri
     data: {
       templateId: template.id,
       userId: userId,
-      content,
+      comment,
     },
   });
 

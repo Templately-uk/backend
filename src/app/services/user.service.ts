@@ -13,14 +13,9 @@ export const getTemplatesByUser = async (userID: string): Promise<GetTemplatesBy
       id: true,
       route: true,
       title: true,
-      summary: true,
+      useCase: true,
       userId: true,
-      category: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
+      category: true,
       tags: {
         select: {
           name: true,

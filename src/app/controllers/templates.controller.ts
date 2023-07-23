@@ -3,7 +3,7 @@ import InvalidRouteError from '../errors/InvalidRoute.error';
 import { getTemplateByRoute, incrementViews } from '../services/templates.service';
 import { sendSuccess } from '../utils/responseUtils';
 import { redis } from '../../config/redis';
-import { Category, Tag, Template } from '@prisma/client';
+import { Tag, Template } from '@prisma/client';
 
 const router = Router();
 
@@ -13,7 +13,7 @@ interface TemplateData {
     name: string;
     image: string;
   };
-  category: Category;
+  category: string;
   tags: Tag[];
 }
 /**
@@ -45,8 +45,8 @@ router.get('/template/:route', async (req: Request, res: Response, next: NextFun
           id: data.template.id,
           route: data.template.route,
           title: data.template.title,
-          summary: data.template.summary,
-          body: data.template.body,
+          useCase: data.template.useCase,
+          template: data.template.template,
           aiTones: data.template.aiTones,
           createdAt: data.template.createdAt,
           updatedAt: data.template.updatedAt,
@@ -54,10 +54,7 @@ router.get('/template/:route', async (req: Request, res: Response, next: NextFun
             name: data.user.name,
             image: data.user.image,
           },
-          category: {
-            id: data.category.id,
-            name: data.category.name,
-          },
+          category: data.category,
           reviewed: true,
           tags: data.tags,
         },

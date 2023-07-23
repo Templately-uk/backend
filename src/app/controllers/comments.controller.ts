@@ -6,6 +6,7 @@ import authMiddleware from '../middlewares/authMiddleware';
 import * as yup from 'yup';
 import NoAuthorisationError from '../errors/noAuth.error';
 import { rateLimit } from 'express-rate-limit';
+import InvalidRouterParamError from '../errors/invalidRouterParam.error';
 
 const router = Router();
 
@@ -16,7 +17,7 @@ const router = Router();
 router.get('/comments/:route', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { route } = req.params;
-    if (!route) throw new InvalidRouteError(['route']);
+    if (!route) throw new InvalidRouterParamError('route');
 
     const comments = await getCommentsByTemplateRoute(route);
     sendSuccess(

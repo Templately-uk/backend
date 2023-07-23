@@ -12,90 +12,51 @@ datasource db {
 }
 
 // Defined schemea
-// Goes here
 
 model Template {
-  // Identifiers & references
-  id         Int     @id @default(autoincrement())
-  route      String  @unique
-  accountId  String?
-  categoryId Int
+  id         Int       @id @default(autoincrement())
+  route      String    @unique
+  category   String
   tags       Tag[]
-
-  // User Identity
-  userId String
-
-  // Actual template
-  title   String
-  summary String
-  body    String // The actual email template body, storing it as string.
-
-  // AI
-  aiTones String
-
-  // Moderation
+  userId     String
+  title      String
+  useCase    String
+  template   String
+  aiTones    String
   rejected   String?
   rejectedBy String?
-
-  // Meta
-  views Int @default(0)
-
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  category Category  @relation(fields: [categoryId], references: [id])
-  comments Comment[]
-  votes    Vote[]
-}
-
-model Category {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-
-  description String
-
-  createdAt DateTime @default(now())
-
-  templates Template[]
+  views      Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  comments   Comment[]
+  votes      Vote[]
 }
 
 model Tag {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-
-  createdAt DateTime @default(now())
-
-  userId String
-
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  userId    String
   templates Template[]
 }
 
 model Comment {
-  // Identifiers & references
-  id         Int    @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   templateId Int
   userId     String
-
-  content String
-
-  // Moderation
+  comment    String
   reviewedAt DateTime?
   reviewedBy String?
-
-  createdAt DateTime @default(now())
-
-  template Template @relation(fields: [templateId], references: [id])
+  createdAt  DateTime  @default(now())
+  template   Template  @relation(fields: [templateId], references: [id])
 }
 
 model Vote {
-  id         Int    @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   templateId Int
   userId     String
-
-  createdAt DateTime @default(now())
-
-  template Template @relation(fields: [templateId], references: [id])
+  createdAt  DateTime @default(now())
+  template   Template @relation(fields: [templateId], references: [id])
 
   @@unique([templateId, userId])
 }

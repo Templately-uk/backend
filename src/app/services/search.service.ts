@@ -24,12 +24,12 @@ export const searchTemplates = async (
   // Search for the templates by given search terms where greater than 3 characters
   const whereClause: PrismaType.TemplateWhereInput = {};
   if (searchTerms && searchTerms.length >= 3) {
-    whereClause.OR = [{ title: { search: searchTerms } }, { summary: { search: searchTerms } }];
+    whereClause.OR = [{ title: { search: searchTerms } }, { useCase: { search: searchTerms } }];
   }
 
   // Filter by categories
   if (categories) {
-    whereClause.category = { name: { in: categories.split(',') } };
+    whereClause.category = { in: categories.split(',') };
   }
 
   // Filter by tags
@@ -48,13 +48,8 @@ export const searchTemplates = async (
       id: true,
       route: true,
       title: true,
-      summary: true,
-      category: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
+      useCase: true,
+      category: true,
       tags: {
         select: {
           name: true,
@@ -99,6 +94,8 @@ interface TemplateSearchResult {
   id: number;
   route: string;
   title: string;
+  category: string;
+  useCase: string;
   user: {
     name: string | null;
     image: string | null;

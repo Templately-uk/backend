@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { sendSuccess } from '../utils/responseUtils';
 import { searchTemplates } from '../services/search.service';
 import * as yup from 'yup';
+import { Categories } from '../types/category';
 
 const router = Router();
 
@@ -10,13 +11,6 @@ const router = Router();
  * It uses the Prisma search functionality for finding templates.
  * TODO: improve the performance of the search
  */
-// const SearchLimiter = rateLimit({
-//   windowMs: 1 * 60 * 1000,
-//   max: 5,
-//   message: 'Too many searches, please try again in a minute.',
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// });
 router.get('/search/:terms?', async (req: Request, res: Response, next: NextFunction) => {
   try {
     await SearchSchema.validate(req.query);
@@ -54,7 +48,14 @@ const SearchSchema = yup.object().shape({
   offset: yup.number().min(0).integer().required(),
   sort: yup.string().oneOf(['createdAt', 'views', 'votes']).required(),
   order: yup.string().oneOf(['asc', 'desc']).required(),
-  categories: yup.string(),
+  categories: yup
+    .string()
+    .test('is-valid-category', 'Invalid category/categories', (value) => {
+      if (!value) return true;
+      const categories = value.split(',');
+      return categories.every((category) => Object.keys(Categories).includes(category.trim()));
+    })
+    .nullable(),
   tags: yup.string(),
 });
 
