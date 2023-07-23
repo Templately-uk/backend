@@ -3,7 +3,7 @@ import InvalidRouteError from '../errors/InvalidRoute.error';
 import { getTemplateByRoute, incrementViews } from '../services/templates.service';
 import { sendSuccess } from '../utils/responseUtils';
 import { redis } from '../../config/redis';
-import { Tag, Template } from '@prisma/client';
+import { Template } from '@prisma/client';
 
 const router = Router();
 
@@ -14,7 +14,9 @@ interface TemplateData {
     image: string;
   };
   category: string;
-  tags: Tag[];
+  tags: {
+    name: string;
+  }[];
 }
 /**
  * This endpoint is used to fetch a specific template along with its metadata,

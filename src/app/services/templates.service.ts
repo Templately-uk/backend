@@ -1,4 +1,4 @@
-import { Tag, Template } from '@prisma/client';
+import { Template } from '@prisma/client';
 import { prisma } from '../../config/prisma';
 import { findOrCreateTags } from './tags.service';
 import CannotFindTemplateError from '../errors/cannotFindTemplate.error';

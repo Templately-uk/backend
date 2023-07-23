@@ -26,7 +26,7 @@ const onJob = async (job: Job) => {
   job.progress(20);
 
   // Send a request to ChatGPT API to perform sentiment analysis prompt
-  const aiTones = await getChatGptCompletion(template.body);
+  const aiTones = await getChatGptCompletion(template.template);
 
   job.progress(80);
 
