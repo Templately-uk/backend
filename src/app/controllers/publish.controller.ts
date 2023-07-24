@@ -10,6 +10,7 @@ import UnexpectedDatabaseError from '../errors/unexpectedDatabase.error';
 import { templateAnalysisQueue } from '../../config/redis';
 import Filter from 'bad-words';
 import { Categories } from '../types/category';
+import sanitizeHtml from 'sanitize-html';
 
 const router = Router();
 
@@ -31,12 +32,15 @@ router.post(
     try {
       await NewTemplateScheme.validate(req.body);
 
+      // Sanitze the html for XSS attacks
+      const sanitizedTemplate = sanitizeHtml(req.body.template);
+
       const body = {
         title: req.body.title,
         category: String(req.body.category).toLowerCase().trim(),
         tags: req.body.tags?.map((tag: string) => String(tag).toLowerCase().replace(' ', '_')),
         useCase: req.body.usecase,
-        template: req.body.template,
+        template: sanitizedTemplate,
       };
 
       // Check if the template contains profanity
