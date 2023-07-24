@@ -26,7 +26,14 @@ const onJob = async (job: Job) => {
   job.progress(20);
 
   // Send a request to ChatGPT API to perform sentiment analysis prompt
-  const aiTones = await getChatGptCompletion(template.template);
+  const response = await getChatGptCompletion(template.template);
+  const pattern = /"(.*?)"/; // Regular expression to capture anything between quotes
+  const match = pattern.exec(response);
+
+  if (match == undefined || match.length < 1) throw new Error(response);
+
+  const aiTones = match[1];
+  if (!aiTones) throw new UnexpectedChatGPTError(response);
 
   job.progress(80);
 
@@ -48,21 +55,16 @@ const onJob = async (job: Job) => {
  */
 const preparePrompt = (template: string) => {
   return `
-    I want you to act as an Email Template Analysis Tones AI. 
-    Please provide me with an emotional analysis of a provided email template.
+I want you to act as an Email Template Analysis Tones AI. 
+Please provide me with an emotional analysis of a provided email template.
 
-    Emotional analysis tones to use: 
-  	professional, friendly, assertive, polite, humorous, critical, inviting, formal, casual, 
-    grateful, apologetic, cautious, sarcastic, sympathetic, motivational, informative, urgent
-	  reassuring, instructional, appreciative
+Emotional analysis tones to use: professional, friendly, assertive, polite, humorous, critical, inviting, formal, casual, grateful, apologetic, cautious, sarcastic, sympathetic, motivational, informative, urgent reassuring, instructional, appreciative
 
-    Email template:
-    ${template}
+Email template:
+${template}
 
-    Produce 4 emotional tones from the template and figures that add up to 100%.
-
-    ONLY output as expected:
-    professional:60,friendly:30,polite:5,inviting:5
+Please produce 4 emotional tones from the template and figures that add up to 100% as expected:
+"tonename:(0-100),tonename:(0-100):tonename:(0-100):tonename:(0-100)"
     `;
 };
 
