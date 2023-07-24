@@ -1,5 +1,6 @@
 import clerk from '@clerk/clerk-sdk-node';
 import { redis } from '../../config/redis';
+import logger from '../../config/logger';
 
 /**
  * Returns the details of a user based on their unique identifier.
@@ -12,7 +13,7 @@ import { redis } from '../../config/redis';
  * The function will return 'unknown' if the request to Clerk takes longer than 5 seconds or fails for any other reason.
  */
 export const getUserById = async (userId: string): Promise<{ name: string; image: string }> => {
-  const identifier = `clerk:user:${userId}`; // Redis key for user
+  const identifier = `clerk:user:${userId.trim()}`; // Redis key for user
 
   const cachedUser = await redis.get(identifier);
   if (cachedUser) {
@@ -20,17 +21,26 @@ export const getUserById = async (userId: string): Promise<{ name: string; image
   }
 
   try {
-    const user = await clerk.users.getUser(identifier);
-    if (!user) throw new Error('User not found');
+    const user = await clerk.users.getUser(userId);
+    if (!user) throw new Error(`User ${userId} not found`);
 
     // Store user data in cache (redis) for 15 minutes
-    await redis.set(identifier, JSON.stringify(user), 'EX', 15 * 60);
+    await redis.set(
+      identifier,
+      JSON.stringify({
+        name: user.firstName,
+        image: user.imageUrl,
+      }),
+      'EX',
+      15 * 60,
+    );
 
     return {
       name: String(user.firstName),
       image: user.imageUrl,
     };
   } catch (error) {
+    logger.error(error);
     return {
       name: 'unknown',
       image: 'unknown',

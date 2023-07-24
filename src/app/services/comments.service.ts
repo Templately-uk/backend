@@ -6,6 +6,7 @@ import { getUserById } from './clerk.service';
  */
 export const getCommentsByTemplateRoute = async (
   templateRoute: string,
+  loggedInUserId?: string,
 ): Promise<
   {
     id: number;
@@ -43,9 +44,17 @@ export const getCommentsByTemplateRoute = async (
   const finalComments = await Promise.all(
     comments.map(async (comment) => {
       let user;
+      let owner = false;
 
       if (comment.userId) {
-        user = await getUserById(comment.userId);
+        const clerkUser = await getUserById(comment.userId);
+        user = {
+          name: clerkUser.name,
+          image: clerkUser.image,
+        };
+
+        if (loggedInUserId && loggedInUserId === comment.userId) owner = true;
+        console.log(loggedInUserId + ':' + comment.userId);
       } else {
         user = {
           name: null,
@@ -56,6 +65,7 @@ export const getCommentsByTemplateRoute = async (
       return {
         ...comment,
         user,
+        owner,
       };
     }),
   );

@@ -7,6 +7,7 @@ import * as yup from 'yup';
 import NoAuthorisationError from '../errors/noAuth.error';
 import { rateLimit } from 'express-rate-limit';
 import InvalidRouterParamError from '../errors/invalidRouterParam.error';
+import optionalAuthMiddleware from '../middlewares/optionalAuthMiddleware';
 
 const router = Router();
 
@@ -14,12 +15,13 @@ const router = Router();
  * This endpoint is used to fetch all the comments for a specific template,
  * based on the provided URL route parameter.
  */
-router.get('/comments/:route', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/comments/:route', optionalAuthMiddleware, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { route } = req.params;
     if (!route) throw new InvalidRouterParamError('route');
 
-    const comments = await getCommentsByTemplateRoute(route);
+    const comments = await getCommentsByTemplateRoute(route, req.userID ? req.userID : undefined);
+
     sendSuccess(
       res,
       {
@@ -37,7 +39,7 @@ router.get('/comments/:route', async (req: Request, res: Response, next: NextFun
  */
 const NewCommentScheme = yup.object().shape({
   route: yup.string().min(3).required(),
-  content: yup.string().min(12).required(),
+  comment: yup.string().min(12).required(),
 });
 const CreateCommentLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 1 hour
@@ -54,13 +56,13 @@ router.post(
       await NewCommentScheme.validate(req.body);
       const body = {
         route: req.body.route,
-        content: req.body.content,
+        comment: req.body.comment,
       };
 
       const userId = req.userID;
       if (!userId) throw new NoAuthorisationError();
 
-      await addNewComment(userId, body.route, body.content);
+      await addNewComment(userId, body.route, body.comment);
       sendSuccess(res, {}, 200);
     } catch (err) {
       console.log(err);
