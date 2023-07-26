@@ -8,6 +8,7 @@ export async function countTemplatesByAllCategories(): Promise<{ category: strin
     const count = await prisma.template.count({
       where: {
         category: category,
+        reviewedAt: { not: null },
       },
     });
 

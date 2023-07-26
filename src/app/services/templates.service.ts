@@ -5,10 +5,14 @@ import CannotFindTemplateError from '../errors/cannotFindTemplate.error';
 import { getUserById } from './clerk.service';
 
 /**
- * Count all templates.
+ * Count all reviewed templates.
  */
 export const countTemplates = async (): Promise<number> => {
-  const count = await prisma.template.count({});
+  const count = await prisma.template.count({
+    where: {
+      reviewedAt: { not: null },
+    },
+  });
   return count;
 };
 

@@ -57,7 +57,7 @@ router.get('/template/:route', async (req: Request, res: Response, next: NextFun
             image: data.user.image,
           },
           category: data.category,
-          reviewed: true,
+          reviewed: data.template.reviewedAt ? true : false,
           tags: data.tags,
         },
       },

@@ -22,7 +22,9 @@ export const searchTemplates = async (
   currentPage: number;
 }> => {
   // Search for the templates by given search terms where greater than 3 characters
-  const whereClause: PrismaType.TemplateWhereInput = {};
+
+  // Ensure that templates in search have been reviewed by a user
+  const whereClause: PrismaType.TemplateWhereInput = { reviewedAt: { not: null } };
   if (searchTerms && searchTerms.length >= 3) {
     whereClause.OR = [{ title: { search: searchTerms } }, { useCase: { search: searchTerms } }];
   }

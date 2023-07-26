@@ -23,8 +23,8 @@ model Template {
   useCase    String
   template   String
   aiTones    String
-  rejected   String?
-  rejectedBy String?
+  reviewedAt DateTime?
+  reviewedBy String?
   views      Int       @default(0)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
