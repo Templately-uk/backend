@@ -21,11 +21,14 @@ const optionalAuthMiddleware = async (req: Request, res: Response, next: NextFun
   const apiSecret = req.headers['x-api-secret'];
   const userID = req.headers['x-user-id'];
 
+  // Check userID is present in headers
+  if (!userID || !apiSecret) return next();
+
   // Get the hashed API secret from environment variables
   const envAPISecret = crypto.createHash('sha256').update(config.api.secret).digest('hex');
 
-  if (!apiSecret || apiSecret !== envAPISecret) {
-    next();
+  if (apiSecret !== envAPISecret) {
+    return next();
   }
 
   // Assign userID to request for controllers to use

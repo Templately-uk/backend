@@ -8,6 +8,7 @@ import NoAuthorisationError from '../errors/noAuth.error';
 import { rateLimit } from 'express-rate-limit';
 import InvalidRouterParamError from '../errors/invalidRouterParam.error';
 import optionalAuthMiddleware from '../middlewares/optionalAuthMiddleware';
+import logger from '../../config/logger';
 
 const router = Router();
 
@@ -20,16 +21,11 @@ router.get('/comments/:route', optionalAuthMiddleware, async (req: Request, res:
     const { route } = req.params;
     if (!route) throw new InvalidRouterParamError('route');
 
-    const comments = await getCommentsByTemplateRoute(route, req.userID ? req.userID : undefined);
+    const comments = await getCommentsByTemplateRoute(route);
 
-    sendSuccess(
-      res,
-      {
-        comments,
-      },
-      200,
-    );
+    return res.status(200).json(comments);
   } catch (err) {
+    logger.error(err);
     next(err);
   }
 });
