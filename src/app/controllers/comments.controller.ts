@@ -7,7 +7,6 @@ import * as yup from 'yup';
 import NoAuthorisationError from '../errors/noAuth.error';
 import { rateLimit } from 'express-rate-limit';
 import InvalidRouterParamError from '../errors/invalidRouterParam.error';
-import optionalAuthMiddleware from '../middlewares/optionalAuthMiddleware';
 import logger from '../../config/logger';
 
 const router = Router();
@@ -16,7 +15,7 @@ const router = Router();
  * This endpoint is used to fetch all the comments for a specific template,
  * based on the provided URL route parameter.
  */
-router.get('/comments/:route', optionalAuthMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+router.get('/comments/:route', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { route } = req.params;
     if (!route) throw new InvalidRouterParamError('route');
